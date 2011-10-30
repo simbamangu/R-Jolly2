@@ -1,0 +1,5 @@
+This is a set of R scripts for analysing transect data from wildlife sample counts. 
+
+The stats are developed from Jolly's (1969) statistics for unequal sample areas, in Norton-Griffiths' (1978) "Counting Animals".
+
+2011-10-29 First draft added, with poor documentation.

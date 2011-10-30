@@ -1,9 +1,3 @@
-# 26-10-2010 This is working OK. Refinements: break when observed = 0, and find way of making the loop more efficient? Takes ~ 21s to calc on Macbook 2.4GHz in R64 2.11.1
-# 11-02-2011 Colin made some great suggestions about indexing and not "growing" vectors, etc. 
-# 15-02-2011 made MUCH more efficient. Now calculates in 2.4s
-# need to check if it's breaking out of loops properly when an admin/stratum doesn't exist.
-# Using "which" might be faster than "subset"? -> turns out indexing probably better (this was added, big reason for efficiency increase)
-
 setwd("/Workspace/R") # Working directory
 library(foreign) # set up read DBF files
 
@@ -28,10 +22,9 @@ jolly.srf <- function(srftable) {
 
 survey='surv01' # Define survey code.
 
-# Get tran and rsod summary tables from database:
-# tran <- read.dbf("/Workspace/Databases/test_surveydata_tran.dbf")
-fsod <- read.dbf("/Workspace/R/Test_Zam09data_FSOD.dbf")
-rsod <- read.dbf("/Workspace/R/Test_Zam09data_RSOD.dbf")
+# Get tran and rsod summary tables from csv:
+fsod <- read.csv("/workspace/R/Test_Zam09data_FSOD.csv")
+rsod <- read.csv("/workspace/R/Test_Zam09data_RSOD.csv")
 
 strata <- levels(fsod$STRATUM) # list of all strata
 spplist <- levels(rsod$CODE) #all species
@@ -44,7 +37,7 @@ srf.results <- data.frame(stratum, admin, sp, obs, R, Y, n, N, varY, sterr) # da
 result <- 1 # the row at which to start adding results to srf.results
 
 # Here's the loop and calculation ...
-system.time({
+system.time({  # To track how long it takes to do this loop.
 for (stratum in strata) {
 	#	fsod.substrat <- subset(fsod, fsod$STRATUM==stratum)                          
 	fsod.substrat <- fsod[fsod$STRATUM == stratum,] 
@@ -82,7 +75,7 @@ for (stratum in strata) {
 }) # ends system timing.
 
 srf.results <- srf.results[1:result-1, ] # trims the table to the actual number of results
-write.dbf(srf.results, paste("/Workspace/Databases/test_", survey, "_result.dbf", sep = ""))
+write.csv(srf.results, paste("/workspace/Databases/test_", survey, "_result.csv", sep = ""))
 
 # let the user know it's all done.
 message <- 	paste("Finished. Table saved to: /Workspace/Databases/test_", survey, "_result.dbf", sep = "")
